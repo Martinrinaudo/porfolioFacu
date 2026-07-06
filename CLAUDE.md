@@ -32,6 +32,12 @@ All pages live under `app/` (App Router). There is no `pages/` directory.
 - `app/page.tsx` — home page (currently the default scaffold)
 - `app/globals.css` — Tailwind v4 import + CSS custom properties for theme colors
 
+## Project Status
+
+- **Supabase — configured and applied.** Real project, schema tracked in `supabase/migrations/`. Tables: `categories`, `photos` (FK `photos.category_id → categories.id`). RLS enabled on both: public `SELECT`, writes (`INSERT`/`UPDATE`/`DELETE`) restricted to a single admin via the `public.is_admin()` helper (checks the JWT's `email` claim), not "any authenticated user". Admin auth flow: `app/admin/login` (sign in) + `app/admin/(protected)/*` (guarded by `proxy.ts` and server-side `getUser()` in the layout). `types/database.types.ts` is generated from the live schema (re-run via the Supabase MCP `generate_typescript_types` tool after schema changes); `types/database.ts` re-exports domain types derived from it. `lib/supabase/client.ts` / `server.ts` are typed with the `Database` generic.
+- **Cloudinary — not integrated yet.** Dependencies (`cloudinary`, `next-cloudinary`) are installed and `next.config.ts` allows `res.cloudinary.com` as a remote image host, but there's no actual upload wiring. `app/admin/(protected)/upload/page.tsx` is a placeholder ("Cloudinary integration next step") — next work item is building the upload form there and writing the resulting `cloudinary_url`/`cloudinary_public_id` into `photos` via the authenticated Supabase client.
+- No public-facing page reads from Supabase yet — `app/page.tsx` is still the default `create-next-app` scaffold.
+
 ## Next.js 16 Breaking Changes
 
 Read `node_modules/next/dist/docs/01-app/02-guides/upgrading/version-16.md` for the full list. The most impactful:
