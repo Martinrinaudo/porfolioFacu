@@ -1,11 +1,14 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { UploadForm } from './upload-form'
 
 export default async function UploadPage() {
   const supabase = await createClient()
   const {
     data: { user },
   } = await supabase.auth.getUser()
+
+  const { data: categories } = await supabase.from('categories').select('*').order('name')
 
   async function logout() {
     'use server'
@@ -28,9 +31,7 @@ export default async function UploadPage() {
             </button>
           </form>
         </div>
-        <p className="text-zinc-400">
-          La integración con Cloudinary va acá. Próximo paso.
-        </p>
+        <UploadForm categories={categories ?? []} />
       </div>
     </div>
   )
